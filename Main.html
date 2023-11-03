@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #000;
+        }
+
+        #game-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <p><button id="resetButton">Reset</button></p>
+    <p>Bounces: <span id="bounceCount">0</span></p>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const resetButton = document.getElementById('resetButton');
+        const bounceCountElement = document.getElementById('bounceCount');
+
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballRadius = 40;
+        let dx = 0;
+        let dy = 0;
+        let bounceCount = 0;
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function updateGameArea() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+                dx = -dx;
+                incrementBounceCount();
+            }
+
+            if (ballY + dy > canvas.height - ballRadius || ballY + dy < ballRadius) {
+                dy = -dy;
+                incrementBounceCount();
+            }
+
+            ballX += dx;
+            ballY += dy;
+
+            drawBall();
+        }
+        function incrementBounceCount() {
+            bounceCount++;
+            bounceCountElement.textContent = bounceCount;
+        }
+        function moveBallToMouse(event) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            dx = (mouseX - ballX) / 10;
+            dy = (mouseY - ballY) / 10;
+        }
+
+        resetButton.addEventListener('click', () => {
+            bounceCount = 0;
+            bounceCountElement.textContent = bounceCount;
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            dx = 0;
+            dy = 0;
+        });
+
+        canvas.addEventListener('click', moveBallToMouse);
+
+        setInterval(updateGameArea, 20);
+    </script>
+</body>
+</html>
